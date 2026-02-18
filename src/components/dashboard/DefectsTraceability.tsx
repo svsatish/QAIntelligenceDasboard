@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Bug, ExternalLink, AlertCircle, CheckCircle2, Clock, XCircle, Plus } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Bug, ExternalLink, AlertCircle, CheckCircle2, Clock, XCircle, Plus, ChevronUp, ChevronDown, Filter } from 'lucide-react';
 import { Defect, TestFailureDefect, Environment } from '../../services/mockData';
 import CreateDefectModal from './CreateDefectModal';
 import { format } from 'date-fns';
@@ -26,6 +26,14 @@ const DefectsTraceability: React.FC<DefectsTraceabilityProps> = ({ defects, test
   const [activeTab, setActiveTab] = useState<'defects' | 'traceability'>('defects');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [prefilledData, setPrefilledData] = useState<PrefilledDefectData | undefined>();
+
+  // Sorting state
+  type SortField = 'id' | 'title' | 'severity' | 'status' | 'assignee' | 'createdDate';
+  const [sortField, setSortField] = useState<SortField>('createdDate');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  // Filtering state
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const openCreateDefectModal = (data?: PrefilledDefectData) => {
     setPrefilledData(data ? { ...data, environment: selectedEnvironment } : { environment: selectedEnvironment });
@@ -73,6 +81,75 @@ const DefectsTraceability: React.FC<DefectsTraceabilityProps> = ({ defects, test
   const inProgressDefects = defects.filter(d => d.status === 'in-progress').length;
   const resolvedDefects = defects.filter(d => d.status === 'resolved').length;
 
+  // Sorting helper
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const severityOrder = { critical: 0, major: 1, minor: 2, trivial: 3 };
+  const statusOrder = { open: 0, 'in-progress': 1, resolved: 2, closed: 3 };
+
+  // Filter and sort defects
+  const filteredAndSortedDefects = useMemo(() => {
+    let result = [...defects];
+
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      result = result.filter(d => d.status === statusFilter);
+    }
+
+    // Apply sorting
+    result.sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case 'id':
+          comparison = a.id.localeCompare(b.id);
+          break;
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'severity':
+          comparison = (severityOrder[a.severity as keyof typeof severityOrder] || 99) -
+                       (severityOrder[b.severity as keyof typeof severityOrder] || 99);
+          break;
+        case 'status':
+          comparison = (statusOrder[a.status as keyof typeof statusOrder] || 99) -
+                       (statusOrder[b.status as keyof typeof statusOrder] || 99);
+          break;
+        case 'assignee':
+          comparison = a.assignee.localeCompare(b.assignee);
+          break;
+        case 'createdDate':
+          comparison = new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime();
+          break;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+    return result;
+  }, [defects, statusFilter, sortField, sortDirection]);
+
+  // Sort header component
+  const SortHeader: React.FC<{ field: SortField; children: React.ReactNode }> = ({ field, children }) => (
+    <th
+      className="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 select-none"
+      onClick={() => handleSort(field)}
+    >
+      <div className="flex items-center gap-1">
+        <span className="text-xs sm:text-sm">{children}</span>
+        <span className="flex flex-col">
+          <ChevronUp size={10} className={sortField === field && sortDirection === 'asc' ? 'text-blue-500' : 'text-gray-300 dark:text-gray-600'} />
+          <ChevronDown size={10} className={`-mt-1 ${sortField === field && sortDirection === 'desc' ? 'text-blue-500' : 'text-gray-300 dark:text-gray-600'}`} />
+        </span>
+      </div>
+    </th>
+  );
+
   return (
     <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-3 sm:p-4' : 'p-4 sm:p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
       {/* Header */}
@@ -112,44 +189,47 @@ const DefectsTraceability: React.FC<DefectsTraceabilityProps> = ({ defects, test
         </div>
       </div>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-4">
-        <div className="bg-red-50 dark:bg-red-900/30 p-3 rounded-lg text-center">
-          <div className="text-2xl font-bold text-red-700 dark:text-red-400">{openDefects}</div>
-          <div className="text-xs text-red-600 dark:text-red-300">Open</div>
-        </div>
-        <div className="bg-orange-50 dark:bg-orange-900/30 p-3 rounded-lg text-center">
-          <div className="text-2xl font-bold text-orange-700 dark:text-orange-400">{criticalDefects}</div>
-          <div className="text-xs text-orange-600 dark:text-orange-300">Critical</div>
-        </div>
-        <div className="bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded-lg text-center">
-          <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">{inProgressDefects}</div>
-          <div className="text-xs text-yellow-600 dark:text-yellow-300">In Progress</div>
-        </div>
-        <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg text-center">
-          <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">{resolvedDefects}</div>
-          <div className="text-xs text-blue-600 dark:text-blue-300">Resolved</div>
-        </div>
+      {/* Status Filter */}
+      <div className="flex items-center justify-end gap-2 mb-4">
+        <Filter size={14} className="text-gray-500 dark:text-gray-400" />
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-2 py-1 text-xs sm:text-sm border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">All Status</option>
+          <option value="open">Open</option>
+          <option value="in-progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="closed">Closed</option>
+        </select>
       </div>
 
       {/* Tabular Content */}
       <div className="overflow-x-auto">
         {activeTab === 'defects' ? (
-          <table className="w-full text-sm">
+          <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">ID</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Title</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Severity</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Status</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Assignee</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Created</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Linked Tests</th>
-                <th className="text-center py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Actions</th>
+                <SortHeader field="id">ID</SortHeader>
+                <SortHeader field="title">Title</SortHeader>
+                <SortHeader field="severity">Severity</SortHeader>
+                <SortHeader field="status">Status</SortHeader>
+                <SortHeader field="assignee">Assignee</SortHeader>
+                <SortHeader field="createdDate">Created</SortHeader>
+                <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-600 dark:text-gray-400 text-xs sm:text-sm">Tests</th>
+                <th className="text-center py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-600 dark:text-gray-400 text-xs sm:text-sm">Link</th>
               </tr>
             </thead>
             <tbody>
-              {defects.map((defect) => (
+              {filteredAndSortedDefects.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-8 text-center text-gray-500 dark:text-gray-400">
+                    No defects found {statusFilter !== 'all' && `with status "${statusFilter}"`}
+                  </td>
+                </tr>
+              ) : (
+                filteredAndSortedDefects.map((defect) => (
                 <tr
                   key={defect.id}
                   className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -197,7 +277,8 @@ const DefectsTraceability: React.FC<DefectsTraceabilityProps> = ({ defects, test
                     </a>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         ) : (
