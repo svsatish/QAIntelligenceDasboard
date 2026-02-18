@@ -156,21 +156,6 @@ const TestDistributionChart: React.FC<TestDistributionChartProps> = ({ projects,
             </div>
           </div>
         </div>
-
-        {/* Defect Severity (if any defects) */}
-        {defectSeverityData.length > 0 && (
-          <div className="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
-            <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 text-center">Open Defects by Severity</h4>
-            <div className="flex justify-center gap-4">
-              {defectSeverityData.map((entry, index) => (
-                <div key={index} className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                  <span className="text-xs text-gray-600 dark:text-gray-400">{entry.name}: {entry.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
