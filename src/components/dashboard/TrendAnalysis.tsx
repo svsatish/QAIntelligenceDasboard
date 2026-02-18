@@ -14,9 +14,9 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({ data }) => {
   const compactView = settings?.dashboard?.compactView ?? false;
 
   return (
-    <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-4' : 'p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
-      <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${compactView ? 'mb-2' : 'mb-4'}`}>Failure Trends Over Time</h3>
-      <div className={compactView ? 'h-64' : 'h-80'}>
+    <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-3 sm:p-4' : 'p-4 sm:p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
+      <h3 className={`text-base sm:text-lg font-semibold text-gray-900 dark:text-white ${compactView ? 'mb-2' : 'mb-4'}`}>Failure Trends</h3>
+      <div className={compactView ? 'h-48 sm:h-64' : 'h-56 sm:h-80'}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#eee'} />

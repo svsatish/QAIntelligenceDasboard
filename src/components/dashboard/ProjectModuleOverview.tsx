@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, FolderKanban, Package, CheckCircle, XCircle, SkipForward, Bug, ExternalLink, Play, TrendingUp, TrendingDown, Minus, Clock, RefreshCw, History } from 'lucide-react';
 import { ProjectData, ModuleTestResult, Defect } from '../../services/mockData';
 import { format, isToday, formatDistanceToNow } from 'date-fns';
@@ -67,12 +67,19 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
 
   // Initialize expanded projects based on autoExpandProjects setting
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(() => {
-    if (autoExpandProjects && projects[0]?.projectId) {
-      return new Set([projects[0].projectId]);
+    if (autoExpandProjects && projects.length > 0) {
+      return new Set(projects.map(p => p.projectId));
     }
     return new Set();
   });
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+
+  // Handle auto-expand setting changes
+  useEffect(() => {
+    if (autoExpandProjects && projects.length > 0) {
+      setExpandedProjects(new Set(projects.map(p => p.projectId)));
+    }
+  }, [autoExpandProjects, projects]);
 
   const toggleProject = (projectId: string) => {
     setExpandedProjects(prev => {
@@ -196,53 +203,53 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
   const summaryUrls = getAzDoUrls('All Projects');
 
   return (
-    <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-4' : 'p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
+    <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-3 sm:p-4' : 'p-4 sm:p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
       {/* Header */}
       <div className={`flex flex-col ${compactView ? 'gap-2 mb-3' : 'gap-3 mb-4'}`}>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <FolderKanban className="text-blue-500" size={24} />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Projects & Modules Overview</h3>
+            <FolderKanban className="text-blue-500" size={20} />
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Projects & Modules</h3>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Run Info */}
             {latestRunTime && (
-              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <Clock size={14} />
-                <span>Last run: <span className="text-gray-700 dark:text-gray-300 font-medium">{formatDistanceToNow(new Date(latestRunTime), { addSuffix: true })}</span></span>
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex-wrap">
+                <Clock size={12} />
+                <span className="hidden sm:inline">Last run: </span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{formatDistanceToNow(new Date(latestRunTime), { addSuffix: true })}</span>
                 <span className="text-gray-400 dark:text-gray-500">•</span>
-                <RefreshCw size={14} />
-                <span><span className="text-gray-700 dark:text-gray-300 font-medium">{totalRunsToday}</span> runs today</span>
+                <span><span className="text-gray-700 dark:text-gray-300 font-medium">{totalRunsToday}</span> runs</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Comparison Mode Toggle */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Compare to:</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Compare:</span>
             <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
               <button
                 onClick={() => setComparisonMode('run')}
-                className={`flex items-center gap-1 px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition-colors ${
                   comparisonMode === 'run'
                     ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <History size={14} />
-                Previous Run
+                <History size={12} />
+                <span className="hidden sm:inline">Previous </span>Run
               </button>
               <button
                 onClick={() => setComparisonMode('date')}
-                className={`flex items-center gap-1 px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition-colors ${
                   comparisonMode === 'date'
                     ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <Clock size={14} />
+                <Clock size={12} />
                 {format(selectedDate, 'MMM dd')}
               </button>
             </div>
@@ -252,46 +259,46 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
               </span>
             )}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {projects.length} Projects • {projects.reduce((acc, p) => acc + p.modules.length, 0)} Modules • {totalTests} Unique Tests
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            {projects.length} Projects • {projects.reduce((acc, p) => acc + p.modules.length, 0)} Modules • {totalTests} Tests
           </div>
         </div>
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-6 gap-3 mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 mb-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
         <div className="text-center">
           <ClickableStat
             value={totalTests}
             href={summaryUrls.testPlans}
-            className="text-xl font-bold text-gray-900 dark:text-white"
+            className="text-base sm:text-xl font-bold text-gray-900 dark:text-white"
             title="View all test plans in Azure DevOps"
           />
-          <div className="text-xs text-gray-500 dark:text-gray-400">Total Tests</div>
+          <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total</div>
         </div>
         <div className="text-center">
           <ClickableStat
             value={totalExecuted}
             href={summaryUrls.testRuns}
-            className="text-xl font-bold text-blue-600 dark:text-blue-400"
+            className="text-base sm:text-xl font-bold text-blue-600 dark:text-blue-400"
             title="View test runs in Azure DevOps"
           />
-          <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
-            <Play size={10} /> Executed
+          <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
+            <Play size={10} /> Exec
           </div>
         </div>
         <div className="text-center">
           <ClickableStat
             value={totalPassed}
             href={summaryUrls.passedTests}
-            className="text-xl font-bold text-green-600 dark:text-green-400"
+            className="text-base sm:text-xl font-bold text-green-600 dark:text-green-400"
             title="View passed tests in Azure DevOps"
           />
-          <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
-            <CheckCircle size={10} /> Passed
+          <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
+            <CheckCircle size={10} /> Pass
           </div>
           {passedTrend.show && (
-            <div className={`text-xs flex items-center justify-center gap-0.5 mt-1 ${passedTrend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <div className={`text-[10px] sm:text-xs flex items-center justify-center gap-0.5 mt-1 ${passedTrend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {passedTrend.value > 0 ? <TrendingUp size={10} /> : passedTrend.value < 0 ? <TrendingDown size={10} /> : <Minus size={10} />}
               {passedTrend.value > 0 ? '+' : ''}{passedTrend.value.toFixed(1)}%
             </div>
@@ -301,34 +308,34 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
           <ClickableStat
             value={totalFailed}
             href={summaryUrls.failedTests}
-            className="text-xl font-bold text-red-600 dark:text-red-400"
+            className="text-base sm:text-xl font-bold text-red-600 dark:text-red-400"
             title="View failed tests in Azure DevOps"
           />
-          <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
-            <XCircle size={10} /> Failed
+          <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
+            <XCircle size={10} /> Fail
           </div>
           {failedTrend.show && (
-            <div className={`text-xs flex items-center justify-center gap-0.5 mt-1 ${failedTrend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <div className={`text-[10px] sm:text-xs flex items-center justify-center gap-0.5 mt-1 ${failedTrend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {failedTrend.value < 0 ? <TrendingDown size={10} /> : failedTrend.value > 0 ? <TrendingUp size={10} /> : <Minus size={10} />}
               {failedTrend.value > 0 ? '+' : ''}{failedTrend.value.toFixed(1)}%
             </div>
           )}
         </div>
         <div className="text-center">
-          <div className="text-xl font-bold text-gray-600 dark:text-gray-400">{totalSkipped}</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
-            <SkipForward size={10} /> Skipped
+          <div className="text-base sm:text-xl font-bold text-gray-600 dark:text-gray-400">{totalSkipped}</div>
+          <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
+            <SkipForward size={10} /> Skip
           </div>
         </div>
         <div className="text-center">
-          <div className={`text-xl font-bold px-2 py-0.5 rounded inline-block ${getPassRateColor(overallPassRate)}`}>
+          <div className={`text-base sm:text-xl font-bold px-1.5 sm:px-2 py-0.5 rounded inline-block ${getPassRateColor(overallPassRate)}`}>
             {overallPassRate.toFixed(1)}%
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">Pass Rate</div>
+          <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Rate</div>
           {passRateTrend.show && (
-            <div className={`text-xs flex items-center justify-center gap-0.5 mt-1 ${passRateTrend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <div className={`text-[10px] sm:text-xs flex items-center justify-center gap-0.5 mt-1 ${passRateTrend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {passRateTrend.value > 0 ? <TrendingUp size={10} /> : passRateTrend.value < 0 ? <TrendingDown size={10} /> : <Minus size={10} />}
-              {passRateTrend.value > 0 ? '+' : ''}{passRateTrend.value.toFixed(1)}% {getComparisonLabel()}
+              {passRateTrend.value > 0 ? '+' : ''}{passRateTrend.value.toFixed(1)}%
             </div>
           )}
         </div>

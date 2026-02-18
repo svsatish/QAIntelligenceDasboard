@@ -101,9 +101,9 @@ const defaultSettings: Settings = {
     refreshInterval: 300, // 5 minutes
     defaultEnvironment: 'Stage',
     showNotifications: true,
-    autoExpandProjects: true,
+    autoExpandProjects: false,
     dateFormat: 'MM/dd/yyyy',
-    compactView: false,
+    compactView: true,
   },
   branding: {
     dashboardName: 'Test Automation Dashboard',

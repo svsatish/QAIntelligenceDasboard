@@ -92,10 +92,10 @@ const TestDistributionChart: React.FC<TestDistributionChartProps> = ({ projects,
   const overallPassRate = totalTests > 0 ? ((totalPassed / totalTests) * 100).toFixed(1) : '0';
 
   return (
-    <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-4' : 'p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
-      <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${compactView ? 'mb-2' : 'mb-4'}`}>Test Results Distribution</h3>
+    <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-3 sm:p-4' : 'p-4 sm:p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
+      <h3 className={`text-base sm:text-lg font-semibold text-gray-900 dark:text-white ${compactView ? 'mb-2' : 'mb-4'}`}>Test Distribution</h3>
 
-      <div className={`${compactView ? 'h-64' : 'h-80'} flex flex-col`}>
+      <div className={`${compactView ? 'h-48 sm:h-64' : 'h-56 sm:h-80'} flex flex-col`}>
         {/* Top section: Pie Chart and Stats side by side */}
         <div className="flex-1 flex gap-4">
           {/* Pie Chart */}

@@ -74,24 +74,24 @@ const DefectsTraceability: React.FC<DefectsTraceabilityProps> = ({ defects, test
   const resolvedDefects = defects.filter(d => d.status === 'resolved').length;
 
   return (
-    <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-4' : 'p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
+    <div className={`bg-white dark:bg-gray-800 ${compactView ? 'p-3 sm:p-4' : 'p-4 sm:p-6'} rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
       {/* Header */}
-      <div className={`flex items-center justify-between ${compactView ? 'mb-3' : 'mb-4'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${compactView ? 'mb-3' : 'mb-4'}`}>
         <div className="flex items-center gap-2">
-          <Bug className="text-red-500" size={24} />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Defects & Traceability</h3>
+          <Bug className="text-red-500" size={20} />
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Defects & Traceability</h3>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => openCreateDefectModal()}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+            className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
           >
-            <Plus size={16} />
-            Create Defect
+            <Plus size={14} />
+            <span className="hidden sm:inline">Create </span>Defect
           </button>
           <button
             onClick={() => setActiveTab('defects')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+            className={`px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
               activeTab === 'defects'
                 ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'

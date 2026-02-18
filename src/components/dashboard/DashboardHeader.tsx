@@ -108,24 +108,25 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   };
 
   return (
-    <div className={`flex flex-col ${compactView ? 'gap-3 mb-4 p-4' : 'gap-4 mb-8 p-6'} bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
+    <div className={`flex flex-col ${compactView ? 'gap-3 mb-4 p-3 sm:p-4' : 'gap-4 mb-8 p-4 sm:p-6'} bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200`}>
       {/* Top Row - Title and Actions */}
-      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center ${compactView ? 'gap-3' : 'gap-4'}`}>
-        <div className="flex items-center gap-3">
+      <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center ${compactView ? 'gap-3' : 'gap-4'}`}>
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           {/* Company Logo */}
           {companyLogo && (
             <img
               src={companyLogo}
               alt="Company Logo"
-              className="w-10 h-10 object-contain rounded-lg"
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-lg"
             />
           )}
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{dashboardName}</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{dashboardName}</h1>
           {/* Data Source Indicator */}
           {isConfigured ? (
             <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700">
               <Cloud size={12} />
-              Azure DevOps
+              <span className="hidden sm:inline">Azure DevOps</span>
+              <span className="sm:hidden">Azure</span>
             </span>
           ) : (
             <span
@@ -134,56 +135,58 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               title="Click to configure Azure DevOps"
             >
               <Database size={12} />
-              Demo Data
+              Demo
             </span>
           )}
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3 flex-wrap">
           <button
             onClick={toggleTheme}
             className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <button
             onClick={onRefresh}
-            className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors border border-gray-200 dark:border-gray-600"
+            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors border border-gray-200 dark:border-gray-600 text-sm"
           >
-            <RefreshCw size={18} />
-            <span>Refresh</span>
+            <RefreshCw size={16} />
+            <span className="hidden sm:inline">Refresh</span>
           </button>
           <button
             onClick={handleDownloadPDF}
-            className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition-colors shadow-sm"
+            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition-colors shadow-sm text-sm"
           >
-            <Download size={18} />
-            <span>Export PDF</span>
+            <Download size={16} />
+            <span className="hidden sm:inline">Export PDF</span>
           </button>
           <button
             onClick={() => setIsSettingsOpen(true)}
             className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             title="Settings"
           >
-            <Settings size={20} />
+            <Settings size={18} />
           </button>
         </div>
       </div>
 
       {/* Filters Row */}
-      <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+      <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-gray-100 dark:border-gray-700">
         {/* Environment Selector */}
-        <div className="flex items-center gap-2">
-          <Server size={18} className="text-gray-500 dark:text-gray-400" />
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Environment:</span>
-          <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2">
+            <Server size={16} className="text-gray-500 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Environment:</span>
+          </div>
+          <div className="flex gap-1.5 sm:gap-2 flex-wrap">
             {enabledEnvironments.map((env) => {
               const isSelected = selectedEnvironment === env.name;
               return (
                 <button
                   key={env.id}
                   onClick={() => onEnvironmentChange(env.name as Environment)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${
+                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg border transition-colors ${
                     isSelected ? '' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                   }`}
                   style={isSelected ? {
@@ -201,23 +204,27 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         </div>
 
         {/* Date Picker */}
-        <div className="flex items-center gap-2 ml-auto">
-          <Calendar size={18} className="text-gray-500 dark:text-gray-400" />
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Run Date:</span>
-          <input
-            type="date"
-            value={format(selectedDate, 'yyyy-MM-dd')}
-            onChange={(e) => onDateChange(new Date(e.target.value))}
-            max={format(new Date(), 'yyyy-MM-dd')}
-            className="px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <span className={`px-2 py-1 text-xs font-medium rounded ${
-            format(selectedDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
-              ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-          }`}>
-            {format(selectedDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(selectedDate, 'MMM dd, yyyy')}
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto sm:ml-auto">
+          <div className="flex items-center gap-2">
+            <Calendar size={16} className="text-gray-500 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Run Date:</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={format(selectedDate, 'yyyy-MM-dd')}
+              onChange={(e) => onDateChange(new Date(e.target.value))}
+              max={format(new Date(), 'yyyy-MM-dd')}
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <span className={`px-2 py-1 text-xs font-medium rounded whitespace-nowrap ${
+              format(selectedDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
+                ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+            }`}>
+              {format(selectedDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(selectedDate, 'MMM dd')}
+            </span>
+          </div>
         </div>
       </div>
 

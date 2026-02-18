@@ -258,16 +258,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
       <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden m-4 flex">
-        {/* Sidebar */}
-        <div className="w-56 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4">
+      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden m-2 sm:m-4 flex flex-col sm:flex-row">
+        {/* Sidebar - horizontal on mobile, vertical on desktop */}
+        <div className="sm:w-56 bg-gray-50 dark:bg-gray-900 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Settings className="text-blue-500" size={24} />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Settings</h2>
+            <Settings className="text-blue-500" size={20} />
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Settings</h2>
           </div>
 
-          {/* Current User Role Badge */}
-          <div className="mb-6 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          {/* Current User Role Badge - hidden on mobile for space */}
+          <div className="hidden sm:block mb-6 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Logged in as:</div>
             <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{currentUser?.displayName || 'User'}</div>
             <div className="flex items-center gap-2 mt-1">
@@ -282,25 +282,25 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          <nav className="space-y-1">
+          <nav className="flex sm:flex-col gap-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
                 {tab.icon}
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
             ))}
           </nav>
 
-          {/* Connection Status */}
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          {/* Connection Status - hidden on mobile */}
+          <div className="hidden sm:block mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 text-sm">
               {isConfigured ? (
                 <>
@@ -932,44 +932,44 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                 <div className="space-y-4">
                   <h4 className="font-medium text-gray-900 dark:text-white">Display Options</h4>
 
-                  <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer">
+                  <div
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer"
+                    onClick={() => updateDashboardSettings({ autoExpandProjects: !settings.dashboard.autoExpandProjects })}
+                  >
                     <div>
                       <span className="text-gray-900 dark:text-white">Auto-expand projects</span>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Automatically expand the first project on load</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Automatically expand all projects on load</p>
                     </div>
-                    <button
-                      onClick={() => updateDashboardSettings({ autoExpandProjects: !settings.dashboard.autoExpandProjects })}
-                      className={settings.dashboard.autoExpandProjects ? 'text-green-600' : 'text-gray-400'}
-                    >
+                    <div className={settings.dashboard.autoExpandProjects ? 'text-green-600' : 'text-gray-400'}>
                       {settings.dashboard.autoExpandProjects ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
-                    </button>
-                  </label>
+                    </div>
+                  </div>
 
-                  <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer">
+                  <div
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer"
+                    onClick={() => updateDashboardSettings({ compactView: !settings.dashboard.compactView })}
+                  >
                     <div>
                       <span className="text-gray-900 dark:text-white">Compact view</span>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Show more data with less spacing</p>
                     </div>
-                    <button
-                      onClick={() => updateDashboardSettings({ compactView: !settings.dashboard.compactView })}
-                      className={settings.dashboard.compactView ? 'text-green-600' : 'text-gray-400'}
-                    >
+                    <div className={settings.dashboard.compactView ? 'text-green-600' : 'text-gray-400'}>
                       {settings.dashboard.compactView ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
-                    </button>
-                  </label>
+                    </div>
+                  </div>
 
-                  <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer">
+                  <div
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer"
+                    onClick={() => updateDashboardSettings({ showNotifications: !settings.dashboard.showNotifications })}
+                  >
                     <div>
                       <span className="text-gray-900 dark:text-white">Show notifications</span>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Display critical alerts and notifications</p>
                     </div>
-                    <button
-                      onClick={() => updateDashboardSettings({ showNotifications: !settings.dashboard.showNotifications })}
-                      className={settings.dashboard.showNotifications ? 'text-green-600' : 'text-gray-400'}
-                    >
+                    <div className={settings.dashboard.showNotifications ? 'text-green-600' : 'text-gray-400'}>
                       {settings.dashboard.showNotifications ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
-                    </button>
-                  </label>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -980,31 +980,31 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                 <div className="space-y-4">
                   <h4 className="font-medium text-gray-900 dark:text-white">Alert Settings</h4>
 
-                  <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer">
+                  <div
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer"
+                    onClick={() => updateNotificationSettings({ enableCriticalAlerts: !settings.notifications.enableCriticalAlerts })}
+                  >
                     <div>
                       <span className="text-gray-900 dark:text-white">Critical failure alerts</span>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Show popup for critical test failures</p>
                     </div>
-                    <button
-                      onClick={() => updateNotificationSettings({ enableCriticalAlerts: !settings.notifications.enableCriticalAlerts })}
-                      className={settings.notifications.enableCriticalAlerts ? 'text-green-600' : 'text-gray-400'}
-                    >
+                    <div className={settings.notifications.enableCriticalAlerts ? 'text-green-600' : 'text-gray-400'}>
                       {settings.notifications.enableCriticalAlerts ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
-                    </button>
-                  </label>
+                    </div>
+                  </div>
 
-                  <label className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer">
+                  <div
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer"
+                    onClick={() => updateNotificationSettings({ enableFailureNotifications: !settings.notifications.enableFailureNotifications })}
+                  >
                     <div>
                       <span className="text-gray-900 dark:text-white">Failure notifications</span>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Notify when tests fail</p>
                     </div>
-                    <button
-                      onClick={() => updateNotificationSettings({ enableFailureNotifications: !settings.notifications.enableFailureNotifications })}
-                      className={settings.notifications.enableFailureNotifications ? 'text-green-600' : 'text-gray-400'}
-                    >
+                    <div className={settings.notifications.enableFailureNotifications ? 'text-green-600' : 'text-gray-400'}>
                       {settings.notifications.enableFailureNotifications ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
-                    </button>
-                  </label>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
