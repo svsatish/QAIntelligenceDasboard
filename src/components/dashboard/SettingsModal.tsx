@@ -52,7 +52,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [baseUrl, setBaseUrl] = useState(settings?.azureDevOps?.baseUrl || 'https://dev.azure.com');
 
   // Branding states
-  const [dashboardName, setDashboardName] = useState(settings?.branding?.dashboardName || 'Test Automation Dashboard');
+  const [dashboardName, setDashboardName] = useState(settings?.branding?.dashboardName || 'QA Intelligence Dashboard');
 
   // New project form
   const [newProjectName, setNewProjectName] = useState('');
@@ -110,7 +110,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
   const handleSaveBranding = () => {
     updateBrandingSettings({
-      dashboardName: dashboardName.trim() || 'Test Automation Dashboard',
+      dashboardName: dashboardName.trim() || 'QA Intelligence Dashboard',
     });
   };
 
@@ -364,7 +364,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                       type="text"
                       value={dashboardName}
                       onChange={(e) => setDashboardName(e.target.value)}
-                      placeholder="Test Automation Dashboard"
+                      placeholder="QA Intelligence Dashboard"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -739,6 +739,100 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                     <span className="flex items-center gap-1 text-red-600 dark:text-red-400 text-sm">
                       <AlertCircle size={16} /> Connection failed
                     </span>
+                  )}
+                </div>
+
+                {/* Data Source Selection */}
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-3">Test Results Data Source</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    Choose where to read test results from. This determines how the dashboard fetches and categorizes data.
+                  </p>
+
+                  <div className="space-y-3">
+                    {/* Demo Data */}
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        settings.dashboard.dataSource === 'demo'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
+                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="dataSource"
+                        value="demo"
+                        checked={settings.dashboard.dataSource === 'demo'}
+                        onChange={() => updateDashboardSettings({ dataSource: 'demo' })}
+                        className="mt-1 accent-blue-600"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900 dark:text-white text-sm">Demo / Mock Data</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          Use built-in sample data. No Azure DevOps connection needed.
+                        </div>
+                      </div>
+                    </label>
+
+                    {/* Pipelines */}
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        settings.dashboard.dataSource === 'pipelines'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
+                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="dataSource"
+                        value="pipelines"
+                        checked={settings.dashboard.dataSource === 'pipelines'}
+                        onChange={() => updateDashboardSettings({ dataSource: 'pipelines' })}
+                        className="mt-1 accent-blue-600"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900 dark:text-white text-sm">
+                          Pipelines → Test Runs
+                          <span className="ml-2 text-[10px] font-normal px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">Recommended</span>
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          Reads test results from all pipeline runs (the Pipeline "Tests" tab). Results are fetched per build and categorized by date & pipeline. Each pipeline becomes a module in the dashboard.
+                        </div>
+                      </div>
+                    </label>
+
+                    {/* Test Plans */}
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        settings.dashboard.dataSource === 'testplans'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
+                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="dataSource"
+                        value="testplans"
+                        checked={settings.dashboard.dataSource === 'testplans'}
+                        onChange={() => updateDashboardSettings({ dataSource: 'testplans' })}
+                        className="mt-1 accent-blue-600"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900 dark:text-white text-sm">Test Plans → Test Runs</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          Reads test results from Test Plans / Test Runs API by date. Modules are derived from area paths. Use this if your automated tests update Test Case execution status.
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  {settings.dashboard.dataSource !== 'demo' && !isConfigured && (
+                    <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                      <p className="text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                        <AlertCircle size={14} />
+                        Fill in the connection fields above and save to use this data source.
+                      </p>
+                    </div>
                   )}
                 </div>
 

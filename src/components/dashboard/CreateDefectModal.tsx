@@ -116,7 +116,7 @@ ${formData.actualResult}
 ${formData.additionalNotes || 'N/A'}
 
 ---
-*Generated from Test Automation Dashboard on ${new Date().toLocaleString()}*`;
+*Generated from QA Intelligence Dashboard on ${new Date().toLocaleString()}*`;
   };
 
   const handleCopyToClipboard = async () => {

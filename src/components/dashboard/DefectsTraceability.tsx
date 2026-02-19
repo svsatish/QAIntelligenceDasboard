@@ -236,7 +236,7 @@ const DefectsTraceability: React.FC<DefectsTraceabilityProps> = ({ defects, test
                 >
                   <td className="py-3 px-4">
                     <a
-                      href={defect.jiraLink}
+                      href={defect.workItemUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
@@ -267,7 +267,7 @@ const DefectsTraceability: React.FC<DefectsTraceabilityProps> = ({ defects, test
                   </td>
                   <td className="py-3 px-4 text-center">
                     <a
-                      href={defect.jiraLink}
+                      href={defect.workItemUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded transition-colors"
@@ -315,7 +315,7 @@ const DefectsTraceability: React.FC<DefectsTraceabilityProps> = ({ defects, test
                         {failure.defects.map((defect) => (
                           <a
                             key={defect.id}
-                            href={defect.jiraLink}
+                            href={defect.workItemUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`text-xs px-2 py-0.5 rounded font-medium hover:underline ${getSeverityColor(defect.severity)}`}

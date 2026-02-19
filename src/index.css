@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ensure proper vertical alignment for table cells */
+table td,
+table th {
+  vertical-align: middle;
+}
+
+

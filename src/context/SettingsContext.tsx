@@ -39,6 +39,8 @@ export interface PipelineConfig {
   type: 'build' | 'release' | 'test';
 }
 
+export type DataSourceMode = 'pipelines' | 'testplans' | 'demo';
+
 export interface DashboardSettings {
   refreshInterval: number; // in seconds, 0 = manual only
   defaultEnvironment: 'QA' | 'Stage' | 'UAT' | 'Prod';
@@ -46,6 +48,7 @@ export interface DashboardSettings {
   autoExpandProjects: boolean;
   dateFormat: 'MM/dd/yyyy' | 'dd/MM/yyyy' | 'yyyy-MM-dd';
   compactView: boolean;
+  dataSource: DataSourceMode;
 }
 
 export interface BrandingSettings {
@@ -104,9 +107,10 @@ const defaultSettings: Settings = {
     autoExpandProjects: false,
     dateFormat: 'MM/dd/yyyy',
     compactView: true,
+    dataSource: 'demo',
   },
   branding: {
-    dashboardName: 'Test Automation Dashboard',
+    dashboardName: 'QA Intelligence Dashboard',
     companyLogo: '',
     logoFileName: '',
   },
@@ -120,9 +124,9 @@ const defaultSettings: Settings = {
     teamsWebhook: '',
   },
   rbac: {
-    enabled: false, // Set to true when Azure AD is configured
-    adminEmails: [], // Add admin emails here
-    leadEmails: [],  // Add lead emails here
+    enabled: false,
+    adminEmails: [],
+    leadEmails: [],
   },
   lastUpdated: new Date().toISOString(),
 };
@@ -169,7 +173,7 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'test-automation-dashboard-settings';
-const SETTINGS_VERSION = '2.0'; // Increment this when settings structure changes
+const SETTINGS_VERSION = '2.2'; // Increment this when settings structure changes
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<Settings>(() => {

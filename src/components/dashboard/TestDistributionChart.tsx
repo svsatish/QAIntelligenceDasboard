@@ -136,21 +136,21 @@ const TestDistributionChart: React.FC<TestDistributionChartProps> = ({ projects,
 
           {/* Summary Stats */}
           <div className="w-40 grid grid-cols-1 gap-2">
-            <div className="bg-green-50 dark:bg-green-900/30 p-2 rounded-lg text-center">
+            <div className="bg-green-50 dark:bg-green-900/30 p-2 rounded-lg flex flex-col items-center justify-start">
               <div className="text-xl font-bold text-green-600 dark:text-green-400">{overallPassRate}%</div>
               <div className="text-xs text-green-700 dark:text-green-300">Pass Rate</div>
             </div>
-            <div className="bg-red-50 dark:bg-red-900/30 p-2 rounded-lg text-center">
+            <div className="bg-red-50 dark:bg-red-900/30 p-2 rounded-lg flex flex-col items-center justify-start">
               <div className="text-xl font-bold text-red-600 dark:text-red-400">
                 {defects.filter(d => d.status === 'open').length}
               </div>
               <div className="text-xs text-red-700 dark:text-red-300">Open Defects</div>
             </div>
-            <div className="bg-blue-50 dark:bg-blue-900/30 p-2 rounded-lg text-center">
+            <div className="bg-blue-50 dark:bg-blue-900/30 p-2 rounded-lg flex flex-col items-center justify-start">
               <div className="text-xl font-bold text-blue-600 dark:text-blue-400">{totalTests}</div>
               <div className="text-xs text-blue-700 dark:text-blue-300">Total Tests</div>
             </div>
-            <div className="bg-purple-50 dark:bg-purple-900/30 p-2 rounded-lg text-center">
+            <div className="bg-purple-50 dark:bg-purple-900/30 p-2 rounded-lg flex flex-col items-center justify-start">
               <div className="text-xl font-bold text-purple-600 dark:text-purple-400">{projects.length}</div>
               <div className="text-xs text-purple-700 dark:text-purple-300">Projects</div>
             </div>

@@ -1,4 +1,4 @@
-# Azure Pipelines - Test Automation Dashboard
+# Azure Pipelines - QA Intelligence Dashboard
 # This pipeline builds and deploys the dashboard to Azure Static Web Apps
 #
 # Prerequisites:
@@ -133,4 +133,3 @@ stages:
 #                    appType: 'webAppLinux'
 #                    appName: 'your-app-name'
 #                    package: '$(Pipeline.Workspace)/dist.zip'
-

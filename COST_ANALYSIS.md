@@ -1,8 +1,6 @@
-# Azure Deployment Cost Analysis
+# QA Intelligence Dashboard - Cost Estimate
 
-## Test Automation Dashboard - Cost Estimate
-
-This document provides a detailed cost analysis for deploying and running the Test Automation Dashboard on Azure infrastructure.
+This document provides a detailed cost analysis for deploying and running the QA Intelligence Dashboard on Azure infrastructure.
 
 ---
 
@@ -330,4 +328,3 @@ To deploy for free right now:
 
 *Last Updated: February 2025*
 *Prices are estimates and may vary by region. Check Azure pricing calculator for exact costs.*
-

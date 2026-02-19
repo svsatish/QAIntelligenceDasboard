@@ -40,8 +40,9 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
 
   // Helper to generate Azure DevOps URLs using settings
   const getAzDoUrls = (projectName: string, moduleName?: string) => {
-    const { organization, baseUrl } = settings.azureDevOps;
-    const base = `${baseUrl}/${organization}/${projectName}`;
+    const organization = settings.azureDevOps?.organization || '{your-org}';
+    const baseUrl = settings.azureDevOps?.baseUrl || 'https://dev.azure.com';
+    const base = `${baseUrl}/${encodeURIComponent(organization)}/${encodeURIComponent(projectName)}`;
 
     return {
       // Test Plans & Runs
@@ -267,7 +268,7 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
 
       {/* Summary Stats */}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 mb-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-        <div className="text-center">
+        <div className="flex flex-col items-center justify-start">
           <ClickableStat
             value={totalTests}
             href={summaryUrls.testPlans}
@@ -276,7 +277,7 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
           />
           <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total</div>
         </div>
-        <div className="text-center">
+        <div className="flex flex-col items-center justify-start">
           <ClickableStat
             value={totalExecuted}
             href={summaryUrls.testRuns}
@@ -287,7 +288,7 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
             <Play size={10} /> Exec
           </div>
         </div>
-        <div className="text-center">
+        <div className="flex flex-col items-center justify-start">
           <ClickableStat
             value={totalPassed}
             href={summaryUrls.passedTests}
@@ -304,7 +305,7 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
             </div>
           )}
         </div>
-        <div className="text-center">
+        <div className="flex flex-col items-center justify-start">
           <ClickableStat
             value={totalFailed}
             href={summaryUrls.failedTests}
@@ -321,13 +322,13 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
             </div>
           )}
         </div>
-        <div className="text-center">
+        <div className="flex flex-col items-center justify-start">
           <div className="text-base sm:text-xl font-bold text-gray-600 dark:text-gray-400">{totalSkipped}</div>
           <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
             <SkipForward size={10} /> Skip
           </div>
         </div>
-        <div className="text-center">
+        <div className="flex flex-col items-center justify-start">
           <div className={`text-base sm:text-xl font-bold px-1.5 sm:px-2 py-0.5 rounded inline-block ${getPassRateColor(overallPassRate)}`}>
             {overallPassRate.toFixed(1)}%
           </div>
@@ -361,6 +362,9 @@ const ProjectModuleOverview: React.FC<ProjectModuleOverviewProps> = ({ projects,
                 <FolderKanban size={18} className="text-blue-500" />
                 <span className="font-medium text-gray-900 dark:text-white">{project.projectName}</span>
                 <span className="text-xs text-gray-500 dark:text-gray-400">({project.modules.length} modules)</span>
+                {project.releaseVersion && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium">{project.releaseVersion}</span>
+                )}
               </div>
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-4">

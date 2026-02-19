@@ -21,13 +21,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   selectedEnvironment,
   onEnvironmentChange,
   selectedDate,
-  onDateChange
+  onDateChange,
 }) => {
   const { toggleTheme, isDark } = useTheme();
   const { isConfigured, settings, getEnabledEnvironments } = useSettings();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const dashboardName = settings.branding?.dashboardName || 'Test Automation Dashboard';
+  const dashboardName = settings.branding?.dashboardName || 'QA Intelligence Dashboard';
   const companyLogo = settings.branding?.companyLogo;
   const compactView = settings?.dashboard?.compactView ?? false;
 
@@ -38,13 +38,64 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     const element = document.getElementById('dashboard-content');
     if (!element) return;
 
+    // Get the current theme
+    const htmlElement = document.documentElement;
+    const isDarkMode = htmlElement.classList.contains('dark');
+
+    // Set background color based on theme
+    const bgColor = isDarkMode ? '#111827' : '#ffffff';
+
     // Capture the dashboard content with better quality settings
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#ffffff',
+      backgroundColor: bgColor,
       logging: false,
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight,
+      onclone: (clonedDoc) => {
+        const clonedElement = clonedDoc.getElementById('dashboard-content');
+        if (clonedElement) {
+          // Fix all grid items to have proper alignment
+          const gridItems = clonedElement.querySelectorAll('.grid > div');
+          gridItems.forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.display = 'flex';
+            htmlEl.style.flexDirection = 'column';
+            htmlEl.style.alignItems = 'center';
+            htmlEl.style.justifyContent = 'flex-start';
+          });
+
+          // Fix flex containers with items-center
+          const flexItems = clonedElement.querySelectorAll('.flex');
+          flexItems.forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            if (htmlEl.classList.contains('items-center')) {
+              htmlEl.style.alignItems = 'center';
+            }
+          });
+
+          // Fix font-bold elements
+          const boldElements = clonedElement.querySelectorAll('.font-bold');
+          boldElements.forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.lineHeight = '1.2';
+            htmlEl.style.display = 'block';
+            htmlEl.style.textAlign = 'center';
+          });
+
+          // Fix text-center elements
+          const textCenterElements = clonedElement.querySelectorAll('.text-center, [class*="text-center"]');
+          textCenterElements.forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.display = 'flex';
+            htmlEl.style.flexDirection = 'column';
+            htmlEl.style.alignItems = 'center';
+            htmlEl.style.justifyContent = 'flex-start';
+          });
+        }
+      }
     });
 
     const imgData = canvas.toDataURL('image/png');
@@ -56,8 +107,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     const headerHeight = 25;
     const margin = 10;
 
-    // Add header background
-    pdf.setFillColor(248, 250, 252);
+    // Add header background based on theme
+    if (isDarkMode) {
+      pdf.setFillColor(31, 41, 55); // gray-800
+    } else {
+      pdf.setFillColor(248, 250, 252); // gray-50
+    }
     pdf.rect(0, 0, pdfWidth, headerHeight, 'F');
 
     // Add company logo if exists
@@ -74,23 +129,40 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     // Add dashboard name
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(14);
-    pdf.setTextColor(31, 41, 55);
+    if (isDarkMode) {
+      pdf.setTextColor(255, 255, 255); // white
+    } else {
+      pdf.setTextColor(31, 41, 55); // gray-800
+    }
     pdf.text(dashboardName, logoEndX, 12);
 
     // Add environment badge
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
+    if (isDarkMode) {
+      pdf.setTextColor(209, 213, 219); // gray-300
+    } else {
+      pdf.setTextColor(75, 85, 99); // gray-600
+    }
     pdf.text(`Environment: ${selectedEnvironment}`, logoEndX, 18);
 
     // Add generation date/time on the right
     const generatedAt = format(new Date(), 'MMM dd, yyyy \'at\' hh:mm a');
     pdf.setFontSize(9);
-    pdf.setTextColor(107, 114, 128);
+    if (isDarkMode) {
+      pdf.setTextColor(156, 163, 175); // gray-400
+    } else {
+      pdf.setTextColor(107, 114, 128); // gray-500
+    }
     pdf.text(`Generated: ${generatedAt}`, pdfWidth - margin, 10, { align: 'right' });
     pdf.text(`Report Date: ${format(selectedDate, 'MMM dd, yyyy')}`, pdfWidth - margin, 16, { align: 'right' });
 
     // Add separator line
-    pdf.setDrawColor(229, 231, 235);
+    if (isDarkMode) {
+      pdf.setDrawColor(75, 85, 99); // gray-600
+    } else {
+      pdf.setDrawColor(229, 231, 235); // gray-200
+    }
     pdf.setLineWidth(0.5);
     pdf.line(margin, headerHeight - 2, pdfWidth - margin, headerHeight - 2);
 

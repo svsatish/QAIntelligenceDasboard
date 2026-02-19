@@ -76,7 +76,7 @@ export interface Defect {
   createdDate: string;
   environment: Environment;
   linkedTestIds: string[];
-  jiraLink?: string;
+  workItemUrl?: string; // Azure DevOps work item URL
 }
 
 export interface TestFailureDefect {
@@ -90,6 +90,14 @@ export interface TestFailureDefect {
 }
 
 // Project and Module Interfaces for hierarchical view
+export interface TestTypeBreakdown {
+  total: number;
+  passed: number;
+  failed: number;
+  skipped: number;
+  passRate: number;
+}
+
 export interface ModuleTestResult {
   moduleId: string;
   moduleName: string;
@@ -99,8 +107,13 @@ export interface ModuleTestResult {
   failed: number;
   skipped: number;
   passRate: number;
+  automatedTests: number;
+  manualTests: number;
+  automated: TestTypeBreakdown;
+  manual: TestTypeBreakdown;
   linkedDefects: string[]; // Defect IDs
   lastRunTime?: string; // ISO timestamp of last run
+  flakyTests?: number; // Tests that flip between pass/fail across runs
   previousRun?: {
     passed: number;
     failed: number;
@@ -120,8 +133,14 @@ export interface ProjectData {
   failed: number;
   skipped: number;
   passRate: number;
+  automatedTests: number;
+  manualTests: number;
+  automated: TestTypeBreakdown;
+  manual: TestTypeBreakdown;
+  releaseVersion?: string;
   lastRunTime?: string; // ISO timestamp of last run
   runCount?: number; // Number of runs today
+  flakyTests?: number;
   previousRun?: {
     passed: number;
     failed: number;
@@ -130,6 +149,26 @@ export interface ProjectData {
     runTime: string;
   };
 }
+
+// Release version type
+export interface ReleaseVersion {
+  id: string;
+  name: string;
+  date: string;
+  environment: Environment;
+}
+
+// Mock release versions
+export const getReleaseVersions = (_env?: Environment): ReleaseVersion[] => {
+  return [
+    { id: 'rel-5', name: 'v3.2.0', date: subDays(new Date(), 0).toISOString(), environment: 'Stage' },
+    { id: 'rel-4', name: 'v3.1.1', date: subDays(new Date(), 3).toISOString(), environment: 'Stage' },
+    { id: 'rel-3', name: 'v3.1.0', date: subDays(new Date(), 7).toISOString(), environment: 'Stage' },
+    { id: 'rel-2', name: 'v3.0.2', date: subDays(new Date(), 14).toISOString(), environment: 'QA' },
+    { id: 'rel-1', name: 'v3.0.1', date: subDays(new Date(), 21).toISOString(), environment: 'QA' },
+    { id: 'rel-0', name: 'v3.0.0', date: subDays(new Date(), 30).toISOString(), environment: 'Prod' },
+  ];
+};
 
 // Mock Data Generators
 
@@ -211,12 +250,12 @@ export const getComparisonData = (env?: Environment): ComparisonData[] => {
 export const getDefects = (env?: Environment): Defect[] => {
   const targetEnv = env || 'Stage';
   return [
-    { id: 'DEF-001', title: 'Payment processing fails for international cards', severity: 'critical', status: 'open', assignee: 'John Smith', createdDate: subDays(new Date(), 2).toISOString(), environment: targetEnv, linkedTestIds: ['TC-201', 'TC-202'], jiraLink: 'https://jira.example.com/DEF-001' },
-    { id: 'DEF-002', title: 'Login timeout on slow connections', severity: 'major', status: 'in-progress', assignee: 'Jane Doe', createdDate: subDays(new Date(), 5).toISOString(), environment: targetEnv, linkedTestIds: ['TC-101'], jiraLink: 'https://jira.example.com/DEF-002' },
-    { id: 'DEF-003', title: 'Cart total calculation off by 1 cent', severity: 'minor', status: 'resolved', assignee: 'Bob Wilson', createdDate: subDays(new Date(), 10).toISOString(), environment: targetEnv, linkedTestIds: ['TC-301', 'TC-302', 'TC-303'], jiraLink: 'https://jira.example.com/DEF-003' },
-    { id: 'DEF-004', title: 'Search results pagination broken', severity: 'major', status: 'open', assignee: 'Alice Brown', createdDate: subDays(new Date(), 1).toISOString(), environment: targetEnv, linkedTestIds: ['TC-401'], jiraLink: 'https://jira.example.com/DEF-004' },
-    { id: 'DEF-005', title: 'User avatar not displaying correctly', severity: 'trivial', status: 'closed', assignee: 'Charlie Davis', createdDate: subDays(new Date(), 15).toISOString(), environment: targetEnv, linkedTestIds: ['TC-501'], jiraLink: 'https://jira.example.com/DEF-005' },
-    { id: 'DEF-006', title: 'API response time exceeds SLA', severity: 'critical', status: 'in-progress', assignee: 'Diana Lee', createdDate: new Date().toISOString(), environment: targetEnv, linkedTestIds: ['TC-601', 'TC-602'], jiraLink: 'https://jira.example.com/DEF-006' },
+    { id: 'DEF-001', title: 'Payment processing fails for international cards', severity: 'critical', status: 'open', assignee: 'John Smith', createdDate: subDays(new Date(), 2).toISOString(), environment: targetEnv, linkedTestIds: ['TC-201', 'TC-202'], workItemUrl: 'https://dev.azure.com/myorg/myproject/_workitems/edit/1001' },
+    { id: 'DEF-002', title: 'Login timeout on slow connections', severity: 'major', status: 'in-progress', assignee: 'Jane Doe', createdDate: subDays(new Date(), 5).toISOString(), environment: targetEnv, linkedTestIds: ['TC-101'], workItemUrl: 'https://dev.azure.com/myorg/myproject/_workitems/edit/1002' },
+    { id: 'DEF-003', title: 'Cart total calculation off by 1 cent', severity: 'minor', status: 'resolved', assignee: 'Bob Wilson', createdDate: subDays(new Date(), 10).toISOString(), environment: targetEnv, linkedTestIds: ['TC-301', 'TC-302', 'TC-303'], workItemUrl: 'https://dev.azure.com/myorg/myproject/_workitems/edit/1003' },
+    { id: 'DEF-004', title: 'Search results pagination broken', severity: 'major', status: 'open', assignee: 'Alice Brown', createdDate: subDays(new Date(), 1).toISOString(), environment: targetEnv, linkedTestIds: ['TC-401'], workItemUrl: 'https://dev.azure.com/myorg/myproject/_workitems/edit/1004' },
+    { id: 'DEF-005', title: 'User avatar not displaying correctly', severity: 'trivial', status: 'closed', assignee: 'Charlie Davis', createdDate: subDays(new Date(), 15).toISOString(), environment: targetEnv, linkedTestIds: ['TC-501'], workItemUrl: 'https://dev.azure.com/myorg/myproject/_workitems/edit/1005' },
+    { id: 'DEF-006', title: 'API response time exceeds SLA', severity: 'critical', status: 'in-progress', assignee: 'Diana Lee', createdDate: new Date().toISOString(), environment: targetEnv, linkedTestIds: ['TC-601', 'TC-602'], workItemUrl: 'https://dev.azure.com/myorg/myproject/_workitems/edit/1006' },
   ];
 };
 
@@ -328,65 +367,65 @@ export const getProjectsData = (env?: Environment, selectedDate?: Date): Project
     {
       projectId: 'PRJ-001',
       projectName: 'E-Commerce Platform',
+      releaseVersion: 'v3.2.0',
       modules: [
-        { moduleId: 'MOD-001', moduleName: 'Authentication', totalTests: 150, executed: 148, passed: 140, failed: 5, skipped: 3, passRate: 94.6, linkedDefects: ['DEF-002'] },
-        { moduleId: 'MOD-002', moduleName: 'Shopping Cart', totalTests: 85, executed: 85, passed: 72, failed: 13, skipped: 0, passRate: 84.7, linkedDefects: ['DEF-003'] },
-        { moduleId: 'MOD-003', moduleName: 'Payment Gateway', totalTests: 120, executed: 118, passed: 95, failed: 21, skipped: 2, passRate: 80.5, linkedDefects: ['DEF-001', 'DEF-006'] },
-        { moduleId: 'MOD-004', moduleName: 'Order Management', totalTests: 95, executed: 93, passed: 88, failed: 3, skipped: 2, passRate: 94.6, linkedDefects: [] },
+        { moduleId: 'MOD-001', moduleName: 'Authentication', totalTests: 150, executed: 148, passed: 140, failed: 5, skipped: 3, passRate: 94.6, automatedTests: 130, manualTests: 20, automated: { total: 130, passed: 125, failed: 3, skipped: 2, passRate: 96.2 }, manual: { total: 20, passed: 15, failed: 2, skipped: 1, passRate: 75.0 }, flakyTests: 3, linkedDefects: ['DEF-002'] },
+        { moduleId: 'MOD-002', moduleName: 'Shopping Cart', totalTests: 85, executed: 85, passed: 72, failed: 13, skipped: 0, passRate: 84.7, automatedTests: 70, manualTests: 15, automated: { total: 70, passed: 60, failed: 10, skipped: 0, passRate: 85.7 }, manual: { total: 15, passed: 12, failed: 3, skipped: 0, passRate: 80.0 }, flakyTests: 2, linkedDefects: ['DEF-003'] },
+        { moduleId: 'MOD-003', moduleName: 'Payment Gateway', totalTests: 120, executed: 118, passed: 95, failed: 21, skipped: 2, passRate: 80.5, automatedTests: 90, manualTests: 30, automated: { total: 90, passed: 72, failed: 16, skipped: 2, passRate: 80.0 }, manual: { total: 30, passed: 23, failed: 5, skipped: 0, passRate: 76.7 }, flakyTests: 5, linkedDefects: ['DEF-001', 'DEF-006'] },
+        { moduleId: 'MOD-004', moduleName: 'Order Management', totalTests: 95, executed: 93, passed: 88, failed: 3, skipped: 2, passRate: 94.6, automatedTests: 80, manualTests: 15, automated: { total: 80, passed: 76, failed: 2, skipped: 2, passRate: 95.0 }, manual: { total: 15, passed: 12, failed: 1, skipped: 0, passRate: 80.0 }, flakyTests: 1, linkedDefects: [] },
       ],
-      totalTests: 450,
-      executed: 444,
-      passed: 395,
-      failed: 42,
-      skipped: 7,
-      passRate: 89.0
+      totalTests: 450, executed: 444, passed: 395, failed: 42, skipped: 7, passRate: 89.0,
+      automatedTests: 370, manualTests: 80,
+      automated: { total: 370, passed: 333, failed: 31, skipped: 6, passRate: 90.0 },
+      manual: { total: 80, passed: 62, failed: 11, skipped: 1, passRate: 77.5 },
+      flakyTests: 11,
     },
     {
       projectId: 'PRJ-002',
       projectName: 'Mobile Banking App',
+      releaseVersion: 'v3.1.1',
       modules: [
-        { moduleId: 'MOD-005', moduleName: 'User Login', totalTests: 80, executed: 80, passed: 78, failed: 2, skipped: 0, passRate: 97.5, linkedDefects: [] },
-        { moduleId: 'MOD-006', moduleName: 'Fund Transfer', totalTests: 110, executed: 108, passed: 100, failed: 6, skipped: 2, passRate: 92.6, linkedDefects: ['DEF-001'] },
-        { moduleId: 'MOD-007', moduleName: 'Bill Payment', totalTests: 65, executed: 64, passed: 60, failed: 3, skipped: 1, passRate: 93.8, linkedDefects: [] },
-        { moduleId: 'MOD-008', moduleName: 'Account Summary', totalTests: 45, executed: 45, passed: 44, failed: 1, skipped: 0, passRate: 97.8, linkedDefects: [] },
+        { moduleId: 'MOD-005', moduleName: 'User Login', totalTests: 80, executed: 80, passed: 78, failed: 2, skipped: 0, passRate: 97.5, automatedTests: 75, manualTests: 5, automated: { total: 75, passed: 74, failed: 1, skipped: 0, passRate: 98.7 }, manual: { total: 5, passed: 4, failed: 1, skipped: 0, passRate: 80.0 }, flakyTests: 1, linkedDefects: [] },
+        { moduleId: 'MOD-006', moduleName: 'Fund Transfer', totalTests: 110, executed: 108, passed: 100, failed: 6, skipped: 2, passRate: 92.6, automatedTests: 85, manualTests: 25, automated: { total: 85, passed: 80, failed: 3, skipped: 2, passRate: 94.1 }, manual: { total: 25, passed: 20, failed: 3, skipped: 0, passRate: 80.0 }, flakyTests: 2, linkedDefects: ['DEF-001'] },
+        { moduleId: 'MOD-007', moduleName: 'Bill Payment', totalTests: 65, executed: 64, passed: 60, failed: 3, skipped: 1, passRate: 93.8, automatedTests: 50, manualTests: 15, automated: { total: 50, passed: 48, failed: 1, skipped: 1, passRate: 96.0 }, manual: { total: 15, passed: 12, failed: 2, skipped: 0, passRate: 80.0 }, flakyTests: 0, linkedDefects: [] },
+        { moduleId: 'MOD-008', moduleName: 'Account Summary', totalTests: 45, executed: 45, passed: 44, failed: 1, skipped: 0, passRate: 97.8, automatedTests: 40, manualTests: 5, automated: { total: 40, passed: 39, failed: 1, skipped: 0, passRate: 97.5 }, manual: { total: 5, passed: 5, failed: 0, skipped: 0, passRate: 100.0 }, flakyTests: 1, linkedDefects: [] },
       ],
-      totalTests: 300,
-      executed: 297,
-      passed: 282,
-      failed: 12,
-      skipped: 3,
-      passRate: 94.9
+      totalTests: 300, executed: 297, passed: 282, failed: 12, skipped: 3, passRate: 94.9,
+      automatedTests: 250, manualTests: 50,
+      automated: { total: 250, passed: 241, failed: 6, skipped: 3, passRate: 96.4 },
+      manual: { total: 50, passed: 41, failed: 6, skipped: 0, passRate: 82.0 },
+      flakyTests: 4,
     },
     {
       projectId: 'PRJ-003',
       projectName: 'Customer Portal',
+      releaseVersion: 'v3.2.0',
       modules: [
-        { moduleId: 'MOD-009', moduleName: 'Dashboard', totalTests: 55, executed: 54, passed: 50, failed: 3, skipped: 1, passRate: 92.6, linkedDefects: ['DEF-006'] },
-        { moduleId: 'MOD-010', moduleName: 'Profile Management', totalTests: 40, executed: 40, passed: 38, failed: 2, skipped: 0, passRate: 95.0, linkedDefects: [] },
-        { moduleId: 'MOD-011', moduleName: 'Support Tickets', totalTests: 70, executed: 68, passed: 62, failed: 4, skipped: 2, passRate: 91.2, linkedDefects: ['DEF-004'] },
-        { moduleId: 'MOD-012', moduleName: 'Notifications', totalTests: 35, executed: 35, passed: 33, failed: 2, skipped: 0, passRate: 94.3, linkedDefects: [] },
+        { moduleId: 'MOD-009', moduleName: 'Dashboard', totalTests: 55, executed: 54, passed: 50, failed: 3, skipped: 1, passRate: 92.6, automatedTests: 45, manualTests: 10, automated: { total: 45, passed: 42, failed: 2, skipped: 1, passRate: 93.3 }, manual: { total: 10, passed: 8, failed: 1, skipped: 0, passRate: 80.0 }, flakyTests: 1, linkedDefects: ['DEF-006'] },
+        { moduleId: 'MOD-010', moduleName: 'Profile Management', totalTests: 40, executed: 40, passed: 38, failed: 2, skipped: 0, passRate: 95.0, automatedTests: 30, manualTests: 10, automated: { total: 30, passed: 29, failed: 1, skipped: 0, passRate: 96.7 }, manual: { total: 10, passed: 9, failed: 1, skipped: 0, passRate: 90.0 }, flakyTests: 0, linkedDefects: [] },
+        { moduleId: 'MOD-011', moduleName: 'Support Tickets', totalTests: 70, executed: 68, passed: 62, failed: 4, skipped: 2, passRate: 91.2, automatedTests: 50, manualTests: 20, automated: { total: 50, passed: 46, failed: 2, skipped: 2, passRate: 92.0 }, manual: { total: 20, passed: 16, failed: 2, skipped: 0, passRate: 80.0 }, flakyTests: 2, linkedDefects: ['DEF-004'] },
+        { moduleId: 'MOD-012', moduleName: 'Notifications', totalTests: 35, executed: 35, passed: 33, failed: 2, skipped: 0, passRate: 94.3, automatedTests: 30, manualTests: 5, automated: { total: 30, passed: 28, failed: 2, skipped: 0, passRate: 93.3 }, manual: { total: 5, passed: 5, failed: 0, skipped: 0, passRate: 100.0 }, flakyTests: 1, linkedDefects: [] },
       ],
-      totalTests: 200,
-      executed: 197,
-      passed: 183,
-      failed: 11,
-      skipped: 3,
-      passRate: 92.9
+      totalTests: 200, executed: 197, passed: 183, failed: 11, skipped: 3, passRate: 92.9,
+      automatedTests: 155, manualTests: 45,
+      automated: { total: 155, passed: 145, failed: 7, skipped: 3, passRate: 93.5 },
+      manual: { total: 45, passed: 38, failed: 4, skipped: 0, passRate: 84.4 },
+      flakyTests: 4,
     },
     {
       projectId: 'PRJ-004',
       projectName: 'Admin Console',
+      releaseVersion: 'v3.1.0',
       modules: [
-        { moduleId: 'MOD-013', moduleName: 'User Management', totalTests: 90, executed: 88, passed: 82, failed: 4, skipped: 2, passRate: 93.2, linkedDefects: [] },
-        { moduleId: 'MOD-014', moduleName: 'Reports & Analytics', totalTests: 75, executed: 73, passed: 68, failed: 3, skipped: 2, passRate: 93.2, linkedDefects: [] },
-        { moduleId: 'MOD-015', moduleName: 'System Config', totalTests: 50, executed: 50, passed: 47, failed: 3, skipped: 0, passRate: 94.0, linkedDefects: [] },
+        { moduleId: 'MOD-013', moduleName: 'User Management', totalTests: 90, executed: 88, passed: 82, failed: 4, skipped: 2, passRate: 93.2, automatedTests: 75, manualTests: 15, automated: { total: 75, passed: 71, failed: 2, skipped: 2, passRate: 94.7 }, manual: { total: 15, passed: 11, failed: 2, skipped: 0, passRate: 73.3 }, flakyTests: 2, linkedDefects: [] },
+        { moduleId: 'MOD-014', moduleName: 'Reports & Analytics', totalTests: 75, executed: 73, passed: 68, failed: 3, skipped: 2, passRate: 93.2, automatedTests: 55, manualTests: 20, automated: { total: 55, passed: 52, failed: 1, skipped: 2, passRate: 94.5 }, manual: { total: 20, passed: 16, failed: 2, skipped: 0, passRate: 80.0 }, flakyTests: 1, linkedDefects: [] },
+        { moduleId: 'MOD-015', moduleName: 'System Config', totalTests: 50, executed: 50, passed: 47, failed: 3, skipped: 0, passRate: 94.0, automatedTests: 40, manualTests: 10, automated: { total: 40, passed: 38, failed: 2, skipped: 0, passRate: 95.0 }, manual: { total: 10, passed: 9, failed: 1, skipped: 0, passRate: 90.0 }, flakyTests: 0, linkedDefects: [] },
       ],
-      totalTests: 215,
-      executed: 211,
-      passed: 197,
-      failed: 10,
-      skipped: 4,
-      passRate: 93.4
+      totalTests: 215, executed: 211, passed: 197, failed: 10, skipped: 4, passRate: 93.4,
+      automatedTests: 170, manualTests: 45,
+      automated: { total: 170, passed: 161, failed: 5, skipped: 4, passRate: 94.7 },
+      manual: { total: 45, passed: 36, failed: 5, skipped: 0, passRate: 80.0 },
+      flakyTests: 3,
     },
   ];
 
@@ -410,6 +449,8 @@ export const getProjectsData = (env?: Environment, selectedDate?: Date): Project
       passed: currentPassed,
       failed: currentFailed,
       passRate: currentPassRate,
+      automatedTests: project.automatedTests,
+      manualTests: project.manualTests,
       lastRunTime: subHours(new Date(), idx).toISOString(),
       runCount: runsToday,
       previousRun: {
@@ -427,6 +468,8 @@ export const getProjectsData = (env?: Environment, selectedDate?: Date): Project
           passed: modCurrentPassed,
           failed: Math.floor(module.failed / envMultiplier),
           passRate: parseFloat(((modCurrentPassed / module.executed) * 100).toFixed(1)),
+          automatedTests: module.automatedTests,
+          manualTests: module.manualTests,
           lastRunTime: subHours(new Date(), idx + mIdx * 0.5).toISOString(),
           previousRun: {
             passed: modPrevPassed,

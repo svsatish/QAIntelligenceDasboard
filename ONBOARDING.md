@@ -1,6 +1,6 @@
-# Onboarding Guide: Azure DevOps Integration
+# ONBOARDING
 
-This guide will help you integrate the Test Automation Dashboard with your Azure DevOps organization to display real test results, defects, and pipeline data.
+This guide will help you integrate the QA Intelligence Dashboard with your Azure DevOps organization to display real test results, defects, and pipeline data.
 
 ## Table of Contents
 
@@ -34,7 +34,7 @@ Before integrating with Azure DevOps, ensure you have:
 2. Click on your profile icon (top right) → **Personal access tokens**
 3. Click **+ New Token**
 4. Configure the token:
-   - **Name**: `Test Automation Dashboard`
+   - **Name**: `QA Intelligence Dashboard`
    - **Organization**: Select your organization
    - **Expiration**: Choose appropriate duration (recommend 1 year)
    - **Scopes**: Select the following permissions:
@@ -62,7 +62,7 @@ Organization Name: {organization-name}
 
 ### Step 1: Open Settings
 
-1. Launch the Test Automation Dashboard
+1. Launch the QA Intelligence Dashboard
 2. Click the **⚙️ Settings** icon in the header
 3. Navigate to the **Azure DevOps** tab
 
@@ -422,4 +422,3 @@ For additional help:
 ---
 
 *Last Updated: February 2025*
-
